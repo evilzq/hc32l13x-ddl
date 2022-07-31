@@ -1,9 +1,9 @@
 use crate::ddl::{GetBit, SetBit};
 use crate::en_result_t;
 use crate::gpio_device::en_gpio_af::GpioAf0;
-use core::convert::TryFrom;
-use core::ops::Add;
+
 use core::ptr;
+
 use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 #[repr(u8)]
@@ -494,21 +494,50 @@ pub fn Gpio_ClrIO(enPort: en_gpio_port, enPin: en_gpio_pin) -> en_result_t {
 ///< GPIO 端口输出电平置位与清零设置
 pub fn Gpio_SetClrPort(enPort: en_gpio_port, u32ValMsk: u32) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        match enPort {
+            en_gpio_port::GpioPortA => {
+                peripheral.GPIO.pabsetclr.write(|w| w.bits(u32ValMsk));
+            }
+            en_gpio_port::GpioPortB => {
+                peripheral.GPIO.pbbsetclr.write(|w| w.bits(u32ValMsk));
+            }
+            en_gpio_port::GpioPortC => {
+                peripheral.GPIO.pcbsetclr.write(|w| w.bits(u32ValMsk));
+            }
+            en_gpio_port::GpioPortD => {
+                peripheral.GPIO.pdbsetclr.write(|w| w.bits(u32ValMsk));
+            }
+        }
+    }
     en_result_t::Ok
 }
 
 ///< GPIO 设置端口为模拟功能
 pub fn Gpio_SetAnalogMode(enPort: en_gpio_port, enPin: en_gpio_pin) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        SetBit(
+            peripheral.GPIO.paads.as_ptr().offset(enPort as isize),
+            enPin as u32,
+            true,
+        );
+    }
     en_result_t::Ok
 }
 
 ///< GPIO 设置端口为端口复用功能
 pub fn Gpio_SetAfMode(enPort: en_gpio_port, enPin: en_gpio_pin, enAf: en_gpio_af) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        peripheral
+            .GPIO
+            .pa00_sel
+            .as_ptr()
+            .offset(enPort as isize)
+            .offset(((enPin as u32) << 2) as isize)
+            .write(enAf as u32);
+    }
     en_result_t::Ok
 }
 
@@ -519,7 +548,18 @@ pub fn Gpio_EnableIrq(
     enType: en_gpio_irqtype,
 ) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        SetBit(
+            peripheral
+                .GPIO
+                .pahie
+                .as_ptr()
+                .offset(enType as isize)
+                .offset(enPort as isize),
+            enPin as u32,
+            true,
+        );
+    }
     en_result_t::Ok
 }
 pub fn Gpio_DisableIrq(
@@ -528,19 +568,40 @@ pub fn Gpio_DisableIrq(
     enType: en_gpio_irqtype,
 ) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        SetBit(
+            peripheral
+                .GPIO
+                .pahie
+                .as_ptr()
+                .offset(enType as isize)
+                .offset(enPort as isize),
+            enPin as u32,
+            false,
+        );
+    }
     en_result_t::Ok
 }
 ///< GPIO 中断状态获取
 pub fn Gpio_GetIrqStatus(enPort: en_gpio_port, enPin: en_gpio_pin) -> bool {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
-    true
+    unsafe {
+        GetBit(
+            peripheral.GPIO.pa_stat.as_ptr().offset(enPort as isize),
+            enPin as u32,
+        )
+    }
 }
 ///< GPIO 中断标志清除
 pub fn Gpio_ClearIrq(enPort: en_gpio_port, enPin: en_gpio_pin) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        SetBit(
+            peripheral.GPIO.pa_iclr.as_ptr().offset(enPort as isize),
+            enPin as u32,
+            false,
+        );
+    }
     en_result_t::Ok
 }
 
@@ -548,13 +609,19 @@ pub fn Gpio_ClearIrq(enPort: en_gpio_port, enPin: en_gpio_pin) -> en_result_t {
 ///< GPIO 中断模式配置
 pub fn Gpio_SfIrqModeCfg(enIrqMode: en_gpio_sf_irqmode) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    peripheral
+        .GPIO
+        .ctrl0
+        .write(|w| w.iesel().bit(enIrqMode as u8 != 0));
     en_result_t::Ok
 }
 ///< GPIO IR输出极性配置
 pub fn Gpio_SfIrPolCfg(enIrPolMode: en_gpio_sf_irpol) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    peripheral
+        .GPIO
+        .ctrl1
+        .write(|w| w.ir_pol().bit(enIrPolMode as u8 != 0));
     en_result_t::Ok
 }
 ///< GPIO HCLK输出配置
@@ -563,7 +630,16 @@ pub fn Gpio_SfHClkOutputCfg(
     enDiv: en_gpio_sf_hclkout_div,
 ) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        peripheral
+            .GPIO
+            .ctrl1
+            .write(|w| w.hclk_en().bit(enGate as u8 != 0));
+        peripheral
+            .GPIO
+            .ctrl1
+            .write(|w| w.hclk_sel().bits(enDiv as u8));
+    }
     en_result_t::Ok
 }
 ///< GPIO PCLK输出配置
@@ -572,42 +648,107 @@ pub fn Gpio_SfPClkOutputCfg(
     enDiv: en_gpio_sf_pclkout_div,
 ) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        peripheral
+            .GPIO
+            .ctrl1
+            .write(|w| w.pclk_en().bit(enGate as u8 != 0));
+        peripheral
+            .GPIO
+            .ctrl1
+            .write(|w| w.pclk_sel().bits(enDiv as u8));
+    }
     en_result_t::Ok
 }
 ///< GPIO 外部时钟输入配置
 pub fn Gpio_SfExtClkCfg(enExtClk: en_gpio_sf_ssn_extclk) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        peripheral
+            .GPIO
+            .ctrl1
+            .write(|w| w.ext_clk_sel().bits(enExtClk as u8));
+    }
     en_result_t::Ok
 }
 ///< GPIO SPI SSN输入配置
 pub fn Gpio_SfSsnCfg(enSpi: en_gpio_sf_ssnspi, enSsn: en_gpio_sf_ssn_extclk) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        match enSpi {
+            en_gpio_sf_ssnspi::GpioSpi0 => {
+                peripheral
+                    .GPIO
+                    .ctrl1
+                    .write(|w| w.ssn0_sel().bits(enSsn as u8));
+            }
+            en_gpio_sf_ssnspi::GpioSpi1 => {
+                peripheral
+                    .GPIO
+                    .ctrl2
+                    .write(|w| w.ssn1_sel().bits(enSsn as u8));
+            }
+        }
+    }
     en_result_t::Ok
 }
 ///< GPIO Timer 门控输入配置
 pub fn Gpio_SfTimGCfg(enTimG: en_gpio_sf_tim_g, enSf: en_gpio_sf) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        peripheral
+            .GPIO
+            .timgs
+            .modify(|r, w| w.bits(r.bits() & !(0x7 << enTimG as u32)));
+        peripheral
+            .GPIO
+            .timgs
+            .modify(|r, w| w.bits(r.bits() | ((enSf as u32) << enTimG as u32)));
+    }
     en_result_t::Ok
 }
 ///< GPIO Timer ETR选择配置
 pub fn Gpio_SfTimECfg(enTimE: en_gpio_sf_tim_e, enSf: en_gpio_sf) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        peripheral
+            .GPIO
+            .times
+            .modify(|r, w| w.bits(r.bits() & !(0x7 << enTimE as u32)));
+        peripheral
+            .GPIO
+            .times
+            .modify(|r, w| w.bits(r.bits() | ((enSf as u32) << enTimE as u32)));
+    }
     en_result_t::Ok
 }
 ///< GPIO Timer 捕获输入配置
 pub fn Gpio_SfTimCCfg(enTimC: en_gpio_sf_tim_c, enSf: en_gpio_sf) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        peripheral
+            .GPIO
+            .timcps
+            .modify(|r, w| w.bits(r.bits() & !(0x7 << enTimC as u32)));
+        peripheral
+            .GPIO
+            .timcps
+            .modify(|r, w| w.bits(r.bits() | ((enSf as u32) << enTimC as u32)));
+    }
     en_result_t::Ok
 }
 ///< GPIO PCA捕获选择配置
 pub fn Gpio_SfPcaCfg(enPca: en_gpio_sf_pca, enSf: en_gpio_sf) -> en_result_t {
     let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
-    unsafe {}
+    unsafe {
+        peripheral
+            .GPIO
+            .pcas
+            .modify(|r, w| w.bits(r.bits() & !(0x7 << enPca as u32)));
+        peripheral
+            .GPIO
+            .pcas
+            .modify(|r, w| w.bits(r.bits() | ((enSf as u32) << enPca as u32)));
+    }
     en_result_t::Ok
 }
