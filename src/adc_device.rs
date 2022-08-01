@@ -1,4 +1,6 @@
 #![allow(dead_code)]
+use crate::delay::delay10us;
+use num_enum::{IntoPrimitive, TryFromPrimitive};
 
 use crate::en_result_t;
 #[doc = "SCAN模式使用ADC CH0"]
@@ -19,23 +21,26 @@ const ADC_SCAN_CH6_EN: u8 = 0x1u8 << 6;
 const ADC_SCAN_CH7_EN: u8 = 0x1u8 << 7;
 
 #[doc = "ADC转换模式"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_mode {
     AdcSglMode = 0,  //* 单输入通道单次转换模式 */
     AdcScanMode = 1, //* 多输入通道顺序/插队扫描转换模式*/
 }
 
 #[doc = "ADC时钟分频选择"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_clk_div {
-    AdcMskClkDiv1 = (0 << 2), //* PCLK */
-    AdcMskClkDiv2 = 1 << 2,   //* 1/2 PCLK */
-    AdcMskClkDiv4 = 2 << 2,   //* 1/4 PCLK */
-    AdcMskClkDiv8 = 3 << 2,   //* 1/8 PCLK */
+    AdcMskClkDiv1 = 0 << 2, //* PCLK */
+    AdcMskClkDiv2 = 1 << 2, //* 1/2 PCLK */
+    AdcMskClkDiv4 = 2 << 2, //* 1/4 PCLK */
+    AdcMskClkDiv8 = 3 << 2, //* 1/8 PCLK */
 }
 
 #[doc = "ADC参考电压"]
 #[repr(u32)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_ref_vol_sel {
     AdcMskRefVolSelInBgr1p5 = 0x0 << 9, //*内部参考电压1.5V(SPS<=200kHz)*/
     AdcMskRefVolSelInBgr2p5 = 0x1 << 9, //*内部参考电压2.5V(avdd>3V;SPS<=200kHz)*/
@@ -44,7 +49,8 @@ pub enum en_adc_ref_vol_sel {
 }
 
 #[doc = "ADC转换通道选择"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_samp_ch_sel {
     AdcExInputCH0 = 0,   //*使用PA00*/
     AdcExInputCH1 = 1,   //*使用PA01*/
@@ -81,6 +87,7 @@ pub enum en_adc_samp_ch_sel {
 
 #[doc = "ADC输入信号放大器控制"]
 #[repr(u32)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_op_buf {
     AdcMskBufEnable = 1 << 11, //* 打开放大器BUF */
     AdcMskBufDisable = 0,      //* 关闭放大器BUF */
@@ -88,6 +95,7 @@ pub enum en_adc_op_buf {
 
 #[doc = "ADC采样周期选择"]
 #[repr(u32)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_samp_cycle_sel {
     AdcMskSampCycle4Clk = 0 << 12,  //*4个采样时钟*/
     AdcMskSampCycle6Clk = 1 << 12,  //*6个采样时钟*/
@@ -97,6 +105,7 @@ pub enum en_adc_samp_cycle_sel {
 
 #[doc = "ADC内部参考电压使能控制"]
 #[repr(u32)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_in_ref {
     AdcMskInRefEnable = 1 << 14, //* 内部参考电压使能 */
     AdcMskInRefDisable = 0,      //* 内部参考电压关闭 */
@@ -104,6 +113,7 @@ pub enum en_adc_in_ref {
 
 #[doc = "ADC周边模块反射源选择"]
 #[repr(u32)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_trig_sel {
     AdcMskTrigTimer0 = 1 << 0,   //*选择timer0中断源，自动触发ADC采样*/
     AdcMskTrigTimer1 = 1 << 1,   //*选择timer1中断源，自动触发ADC采样*/
@@ -140,14 +150,16 @@ pub enum en_adc_trig_sel {
 }
 
 #[doc = "ADC外部触发源寄存器选择"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_ext_trig_sel {
     AdcExtTrig0 = 0, //*单次及顺序扫描转换 外部触发源选择寄存器*/
     AdcExtTrig1 = 1, //*插队扫描转换 外部触发源选择寄存器*/
 }
 
 #[doc = "ADC顺序转换通道"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_sqr_chmux {
     AdcSQRCH0MUX = 0,   //*顺序扫描模式转换通道0*/
     AdcSQRCH1MUX = 1,   //*顺序扫描模式转换通道1*/
@@ -168,7 +180,8 @@ pub enum en_adc_sqr_chmux {
 }
 
 #[doc = "ADC插队转换通道"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_jqr_chmux {
     AdcJQRCH0MUX = 0, //*转换通道0*/
     AdcJQRCH1MUX = 1, //*转换通道1*/
@@ -177,21 +190,24 @@ pub enum en_adc_jqr_chmux {
 }
 
 #[doc = "ADC结果对齐方式"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_align {
     AdcAlignRight = 0,
     AdcAlignLeft = 1,
 }
 
 #[doc = "ADC转换结果自动累加功能"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_result_acc {
     AdcResultAccEnable = 1,
     AdcResultAccDisable = 0,
 }
 
 #[doc = "ADC中断类型定义"]
-#[repr(u32)]
+#[repr(u8)]
+#[derive(Copy, Clone, Eq, PartialEq, TryFromPrimitive, IntoPrimitive)]
 pub enum en_adc_irq_type {
     AdcMskIrqJqr = 1 << 5, //*ADC插队扫描转换完成*/
     AdcMskIrqSqr = 1 << 4, //*ADC顺序扫描转换完成*/
@@ -239,95 +255,443 @@ pub struct stc_adc_threshold_cfg {
 
 #[doc = "ADC 初始化"]
 pub fn Adc_Init(pstcAdcCfg: &stc_adc_cfg) -> en_result_t {
-    return en_result_t::Ok;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral.ADC.cr0.write(|w| w.bits(1));
+        delay10us(2);
+        peripheral.ADC.cr0.modify(|r, w| {
+            w.bits(
+                r.bits()
+                    | (pstcAdcCfg.enAdcClkDiv as u32
+                        | pstcAdcCfg.enAdcRefVolSel as u32
+                        | pstcAdcCfg.enAdcOpBuf as u32
+                        | pstcAdcCfg.enAdcSampCycleSel as u32
+                        | pstcAdcCfg.enInRef as u32),
+            )
+        });
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.mode().bit(pstcAdcCfg.enAdcMode as u8 != 0));
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.align().bit(pstcAdcCfg.enAdcAlign as u8 != 0));
+    }
+    en_result_t::Ok
 }
 
 #[doc = "ADC 中断使能"]
-pub fn Adc_EnableIrq() {}
+pub fn Adc_EnableIrq() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    peripheral.ADC.cr0.write(|w| w.ie().bit(true))
+}
 #[doc = "ADC 中断禁止"]
-pub fn Adc_DisableIrq() {}
+pub fn Adc_DisableIrq() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    peripheral.ADC.cr0.write(|w| w.ie().bit(false))
+}
 
 #[doc = "ADC 中断/采样完成状态获取"]
 pub fn Adc_GetIrqStatus(enAdcIrq: en_adc_irq_type) -> bool {
-    return true;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    match enAdcIrq {
+        en_adc_irq_type::AdcMskIrqJqr => peripheral.ADC.ifr.read().jqrif().bit(),
+        en_adc_irq_type::AdcMskIrqSqr => peripheral.ADC.ifr.read().sqrif().bit(),
+        en_adc_irq_type::AdcMskIrqReg => peripheral.ADC.ifr.read().regif().bit(),
+        en_adc_irq_type::AdcMskIrqHt => peripheral.ADC.ifr.read().htif().bit(),
+        en_adc_irq_type::AdcMskIrqLt => peripheral.ADC.ifr.read().ltif().bit(),
+        en_adc_irq_type::AdcMskIrqSgl => peripheral.ADC.ifr.read().sglif().bit(),
+    }
 }
 #[doc = "ADC 中断/采样完成状态清除"]
-pub fn Adc_ClrIrqStatus(enAdcIrq: en_adc_irq_type) {}
+pub fn Adc_ClrIrqStatus(enAdcIrq: en_adc_irq_type) {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    match enAdcIrq {
+        en_adc_irq_type::AdcMskIrqJqr => {
+            peripheral.ADC.icr.write(|w| w.jqric().bit(false));
+        }
+        en_adc_irq_type::AdcMskIrqSqr => {
+            peripheral.ADC.icr.write(|w| w.sqric().bit(false));
+        }
+        en_adc_irq_type::AdcMskIrqReg => {
+            peripheral.ADC.icr.write(|w| w.regic().bit(false));
+        }
+        en_adc_irq_type::AdcMskIrqHt => {
+            peripheral.ADC.icr.write(|w| w.htic().bit(false));
+        }
+        en_adc_irq_type::AdcMskIrqLt => {
+            peripheral.ADC.icr.write(|w| w.ltic().bit(false));
+        }
+        en_adc_irq_type::AdcMskIrqSgl => {
+            peripheral.ADC.icr.write(|w| w.sglic().bit(false));
+        }
+    }
+}
 
 #[doc = "ADC 使能"]
-pub fn Adc_Enable() {}
+pub fn Adc_Enable() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    peripheral.ADC.cr0.write(|w| w.en().bit(true));
+}
 #[doc = "ADC 禁止"]
-pub fn Adc_Disable() {}
+pub fn Adc_Disable() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    peripheral.ADC.cr0.write(|w| w.en().bit(false));
+}
 
 #[doc = "ADC 顺序扫描模式配置"]
 pub fn Adc_SqrModeCfg(pstcAdcSqrCfg: &stc_adc_sqr_cfg) -> en_result_t {
-    return en_result_t::Ok;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral.ADC.cr1.write(|w| w.raccclr().bit(false));
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.raccen().bit(pstcAdcSqrCfg.enResultAcc as u8 != 0));
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.dmasqr().bit(pstcAdcSqrCfg.bSqrDmaTrig as u8 != 0));
+        peripheral
+            .ADC
+            .sqr2
+            .write(|w| w.cnt().bits(pstcAdcSqrCfg.u8SqrCnt as u8 - 1));
+    }
+    en_result_t::Ok
 }
 #[doc = "ADC 插队扫描模式配置"]
 pub fn Adc_JqrModeCfg(pstcAdcJqrCfg: &stc_adc_jqr_cfg) -> en_result_t {
-    return en_result_t::Ok;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.dmasqr().bit(pstcAdcJqrCfg.bJqrDmaTrig as u8 != 0));
+        peripheral
+            .ADC
+            .jqr
+            .write(|w| w.bits(pstcAdcJqrCfg.bJqrDmaTrig as u32));
+    }
+    en_result_t::Ok
 }
 
 #[doc = "ADC Sgl 单次转换模式通道选择配置"]
 pub fn Adc_CfgSglChannel(enstcAdcSampCh: en_adc_samp_ch_sel) -> en_result_t {
-    return en_result_t::Ok;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral
+            .ADC
+            .cr0
+            .write(|w| w.sglmux().bits(enstcAdcSampCh as u8));
+    }
+    en_result_t::Ok
 }
 #[doc = "ADC SQR 顺序扫描转换模式通道选择配置"]
 pub fn Adc_CfgSqrChannel(
     enstcAdcSqrChMux: en_adc_sqr_chmux,
     enstcAdcSampCh: en_adc_samp_ch_sel,
 ) -> en_result_t {
-    return en_result_t::Ok;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match enstcAdcSqrChMux {
+            en_adc_sqr_chmux::AdcSQRCH0MUX => {
+                peripheral
+                    .ADC
+                    .sqr0
+                    .write(|w| w.ch0mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH1MUX => {
+                peripheral
+                    .ADC
+                    .sqr0
+                    .write(|w| w.ch1mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH2MUX => {
+                peripheral
+                    .ADC
+                    .sqr0
+                    .write(|w| w.ch2mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH3MUX => {
+                peripheral
+                    .ADC
+                    .sqr0
+                    .write(|w| w.ch3mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH4MUX => {
+                peripheral
+                    .ADC
+                    .sqr0
+                    .write(|w| w.ch4mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH5MUX => {
+                peripheral
+                    .ADC
+                    .sqr0
+                    .write(|w| w.ch5mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH6MUX => {
+                peripheral
+                    .ADC
+                    .sqr1
+                    .write(|w| w.ch6mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH7MUX => {
+                peripheral
+                    .ADC
+                    .sqr1
+                    .write(|w| w.ch7mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH8MUX => {
+                peripheral
+                    .ADC
+                    .sqr1
+                    .write(|w| w.ch8mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH9MUX => {
+                peripheral
+                    .ADC
+                    .sqr1
+                    .write(|w| w.ch9mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH10MUX => {
+                peripheral
+                    .ADC
+                    .sqr1
+                    .write(|w| w.ch10mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH11MUX => {
+                peripheral
+                    .ADC
+                    .sqr1
+                    .write(|w| w.ch11mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH12MUX => {
+                peripheral
+                    .ADC
+                    .sqr2
+                    .write(|w| w.ch12mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH13MUX => {
+                peripheral
+                    .ADC
+                    .sqr2
+                    .write(|w| w.ch13mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH14MUX => {
+                peripheral
+                    .ADC
+                    .sqr2
+                    .write(|w| w.ch14mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_sqr_chmux::AdcSQRCH15MUX => {
+                peripheral
+                    .ADC
+                    .sqr2
+                    .write(|w| w.ch15mux().bits(enstcAdcSampCh as u8));
+            }
+        }
+    }
+    en_result_t::Ok
 }
 #[doc = "ADC JQR 插队扫描转换模式通道选择配置"]
 pub fn Adc_CfgJqrChannel(
     enstcAdcJqrChMux: en_adc_jqr_chmux,
     enstcAdcSampCh: en_adc_samp_ch_sel,
 ) -> en_result_t {
-    return en_result_t::Ok;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match enstcAdcJqrChMux {
+            en_adc_jqr_chmux::AdcJQRCH0MUX => {
+                peripheral
+                    .ADC
+                    .jqr
+                    .write(|w| w.ch0mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_jqr_chmux::AdcJQRCH1MUX => {
+                peripheral
+                    .ADC
+                    .jqr
+                    .write(|w| w.ch1mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_jqr_chmux::AdcJQRCH2MUX => {
+                peripheral
+                    .ADC
+                    .jqr
+                    .write(|w| w.ch2mux().bits(enstcAdcSampCh as u8));
+            }
+            en_adc_jqr_chmux::AdcJQRCH3MUX => {
+                peripheral
+                    .ADC
+                    .jqr
+                    .write(|w| w.ch3mux().bits(enstcAdcSampCh as u8));
+            }
+        }
+    }
+    en_result_t::Ok
 }
 
 #[doc = "ADC 单次转换外部触发源配置"]
-pub fn Adc_SglExtTrigCfg(enAdcTrigSel: en_adc_trig_sel, bValue: bool) {}
+pub fn Adc_SglExtTrigCfg(enAdcTrigSel: en_adc_trig_sel, bValue: bool) {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        if bValue {
+            peripheral
+                .ADC
+                .exttrigger0
+                .modify(|r, w| w.bits(r.bits() | enAdcTrigSel as u32));
+        } else {
+            peripheral
+                .ADC
+                .exttrigger0
+                .modify(|r, w| w.bits(r.bits() & !(enAdcTrigSel as u32)));
+        }
+    }
+}
 #[doc = "ADC 顺序扫描转换外部触发源配置"]
-pub fn Adc_SqrExtTrigCfg(enAdcTrigSel: en_adc_trig_sel, bValue: bool) {}
+pub fn Adc_SqrExtTrigCfg(enAdcTrigSel: en_adc_trig_sel, bValue: bool) {
+    Adc_SglExtTrigCfg(enAdcTrigSel, bValue)
+}
 #[doc = "ADC 插队扫描转换外部触发源配置"]
-pub fn Adc_JqrExtTrigCfg(enAdcTrigSel: en_adc_trig_sel, bValue: bool) {}
+pub fn Adc_JqrExtTrigCfg(enAdcTrigSel: en_adc_trig_sel, bValue: bool) {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        if bValue {
+            peripheral
+                .ADC
+                .exttrigger1
+                .modify(|r, w| w.bits(r.bits() | enAdcTrigSel as u32));
+        } else {
+            peripheral
+                .ADC
+                .exttrigger1
+                .modify(|r, w| w.bits(r.bits() & !(enAdcTrigSel as u32)));
+        }
+    }
+}
 
 #[doc = "ADC 阈值比较功能配置"]
-pub fn Adc_ThresholdCfg(pstcAdcThrCfg: &stc_adc_threshold_cfg) {}
+pub fn Adc_ThresholdCfg(pstcAdcThrCfg: &stc_adc_threshold_cfg) {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral
+            .ADC
+            .ht
+            .write(|w| w.bits(pstcAdcThrCfg.u32AdcHighThd as u32));
+        peripheral
+            .ADC
+            .lt
+            .write(|w| w.bits(pstcAdcThrCfg.u32AdcLowThd as u32));
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.thch().bits(pstcAdcThrCfg.enSampChSel as u8));
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.regcmp().bit(pstcAdcThrCfg.bAdcRegCmp as u8 != 0));
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.htcmp().bit(pstcAdcThrCfg.bAdcHtCmp as u8 != 0));
+        peripheral
+            .ADC
+            .cr1
+            .write(|w| w.ltcmp().bit(pstcAdcThrCfg.bAdcLtCmp as u8 != 0));
+    }
+}
 
 #[doc = "ADC 单次转换模式启动"]
-pub fn Adc_SGL_Start() {}
+pub fn Adc_SGL_Start() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral.ADC.sglstart.write(|w| w.bits(1));
+    }
+}
 #[doc = "ADC 单次转换模式停止"]
-pub fn Adc_SGL_Stop() {}
+pub fn Adc_SGL_Stop() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral.ADC.sglstart.write(|w| w.bits(0));
+    }
+}
 
 #[doc = "ADC 顺序扫描转换模式启动"]
-pub fn Adc_SQR_Start() {}
+pub fn Adc_SQR_Start() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral.ADC.sqrstart.write(|w| w.bits(1));
+    }
+}
 #[doc = "ADC 顺序扫描转换模式停止"]
-pub fn Adc_SQR_Stop() {}
+pub fn Adc_SQR_Stop() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral.ADC.sqrstart.write(|w| w.bits(0));
+    }
+}
 
 #[doc = "ADC 插队扫描转换模式启动"]
-pub fn Adc_JQR_Start() {}
+pub fn Adc_JQR_Start() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral.ADC.jqrstart.write(|w| w.bits(1));
+    }
+}
 #[doc = "ADC 插队扫描转换模式停止"]
-pub fn Adc_JQR_Stop() {}
+pub fn Adc_JQR_Stop() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        peripheral.ADC.jqrstart.write(|w| w.bits(0));
+    }
+}
 
 #[doc = "获取单次转换采样值"]
 pub fn Adc_GetSglResult() -> u32 {
-    return 0;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    peripheral.ADC.result.read().bits()
 }
 #[doc = "获取顺序扫描采样值"]
 pub fn Adc_GetSqrResult(enstcAdcSqrChMux: en_adc_sqr_chmux) -> u32 {
-    return 0;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    match enstcAdcSqrChMux {
+        en_adc_sqr_chmux::AdcSQRCH0MUX => peripheral.ADC.sqrresult0.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH1MUX => peripheral.ADC.sqrresult1.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH2MUX => peripheral.ADC.sqrresult2.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH3MUX => peripheral.ADC.sqrresult3.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH4MUX => peripheral.ADC.sqrresult4.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH5MUX => peripheral.ADC.sqrresult5.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH6MUX => peripheral.ADC.sqrresult6.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH7MUX => peripheral.ADC.sqrresult7.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH8MUX => peripheral.ADC.sqrresult8.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH9MUX => peripheral.ADC.sqrresult9.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH10MUX => peripheral.ADC.sqrresult10.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH11MUX => peripheral.ADC.sqrresult11.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH12MUX => peripheral.ADC.sqrresult12.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH13MUX => peripheral.ADC.sqr_result13.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH14MUX => peripheral.ADC.sqrresult14.read().bits(),
+        en_adc_sqr_chmux::AdcSQRCH15MUX => peripheral.ADC.sqrresult15.read().bits(),
+    }
 }
 #[doc = "获取插队扫描采样值"]
 pub fn Adc_GetJqrResult(enstcAdcJqrChMux: en_adc_jqr_chmux) -> u32 {
-    return 0;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    match enstcAdcJqrChMux {
+        en_adc_jqr_chmux::AdcJQRCH0MUX => peripheral.ADC.jqrresult0.read().bits(),
+        en_adc_jqr_chmux::AdcJQRCH1MUX => peripheral.ADC.jqrresult1.read().bits(),
+        en_adc_jqr_chmux::AdcJQRCH2MUX => peripheral.ADC.jqrresult2.read().bits(),
+        en_adc_jqr_chmux::AdcJQRCH3MUX => peripheral.ADC.jqrresult3.read().bits(),
+    }
 }
 
 #[doc = "获取累加采样值"]
 pub fn Adc_GetAccResult() -> u32 {
-    return 0;
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    peripheral.ADC.resultacc.read().bits()
 }
 #[doc = "ADC 累加寄存器结果清除"]
-pub fn Adc_ClrAccResult() {}
+pub fn Adc_ClrAccResult() {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    peripheral.ADC.cr1.write(|w| w.raccclr().bit(false))
+}
