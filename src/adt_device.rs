@@ -1,10 +1,12 @@
+use crate::adt_device::en_adt_hw_cnt::AdtHwCntMax;
 use crate::en_result_t;
+use hc32l13x_pac::adtim4::perar::PERA_R;
 
 const ADTIM_HW_STASTPCLR_EN: u8 = 31;
 const ADTIM_HW_STASTPCLR_DIS: u32 = 0x7FFFFFFF;
-const ADTIM_SS_TIM4: u8 = 1;
-const ADTIM_SS_TIM5: u8 = 2;
-const ADTIM_SS_TIM6: u8 = 4;
+const ADTIM_SS_TIM4: u32 = 1;
+const ADTIM_SS_TIM5: u32 = 2;
+const ADTIM_SS_TIM6: u32 = 4;
 const ADTIM_PORT_BKE_NUM: u8 = 15;
 
 pub enum en_adt_CHxX_port {
@@ -591,86 +593,427 @@ pub enum M0P_ADTIM_TypeDef {
 
 //配置硬件递加事件
 pub fn Adt_CfgHwCntUp(ADTx: &M0P_ADTIM_TypeDef, enAdtHwCntUp: en_adt_hw_cnt) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hcupr
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwCntUp as u32))));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral
+                    .ADTIM5
+                    .hcupr
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwCntUp as u32))));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral
+                    .ADTIM6
+                    .hcupr
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwCntUp as u32))));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //清除硬件递加事件
 pub fn Adt_ClearHwCntUp(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral.ADTIM4.hcupr.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral.ADTIM5.hcupr.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral.ADTIM6.hcupr.write(|w| w.bits(0));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //配置硬件递减事件
 pub fn Adt_CfgHwCntDwn(ADTx: &M0P_ADTIM_TypeDef, enAdtHwCntDwn: en_adt_hw_cnt) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hcdor
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwCntDwn as u32))));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral
+                    .ADTIM5
+                    .hcdor
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwCntDwn as u32))));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral
+                    .ADTIM6
+                    .hcdor
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwCntDwn as u32))));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //清除硬件递减事件
 pub fn Adt_ClearHwCntDwn(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral.ADTIM4.hcdor.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral.ADTIM5.hcdor.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral.ADTIM6.hcdor.write(|w| w.bits(0));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //配置硬件启动事件
 pub fn Adt_CfgHwStart(ADTx: &M0P_ADTIM_TypeDef, enAdtHwStart: en_adt_hw_trig) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwStart as u32))));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral
+                    .ADTIM5
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwStart as u32))));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral
+                    .ADTIM6
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() | (1 << (enAdtHwStart as u32))));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //清除硬件启动事件
 pub fn Adt_ClearHwStart(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral.ADTIM4.hstar.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral.ADTIM5.hstar.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral.ADTIM6.hstar.write(|w| w.bits(0));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //使能硬件启动事件
 pub fn Adt_EnableHwStart(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() | (1 << ADTIM_HW_STASTPCLR_EN)));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral
+                    .ADTIM5
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() | (1 << ADTIM_HW_STASTPCLR_EN)));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral
+                    .ADTIM6
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() | (1 << ADTIM_HW_STASTPCLR_EN)));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //禁止硬件启动事件
 pub fn Adt_DisableHwStart(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() & ADTIM_HW_STASTPCLR_DIS));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral
+                    .ADTIM5
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() & ADTIM_HW_STASTPCLR_DIS));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral
+                    .ADTIM6
+                    .hstar
+                    .modify(|r, w| w.bits(r.bits() & ADTIM_HW_STASTPCLR_DIS));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //配置硬件停止事件
 pub fn Adt_CfgHwStop(ADTx: &M0P_ADTIM_TypeDef, enAdtHwStop: en_adt_hw_trig) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hstpr
+                    .modify(|r, w| w.bits(r.bits() | (1 << enAdtHwStop as u32)));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral
+                    .ADTIM5
+                    .hstpr
+                    .modify(|r, w| w.bits(r.bits() | (1 << enAdtHwStop as u32)));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral
+                    .ADTIM6
+                    .hstpr
+                    .modify(|r, w| w.bits(r.bits() | (1 << enAdtHwStop as u32)));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //清除硬件停止事件
 pub fn Adt_ClearHwStop(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral.ADTIM4.hstpr.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {
+                peripheral.ADTIM5.hstpr.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM6 => {
+                peripheral.ADTIM6.hstpr.write(|w| w.bits(0));
+            }
+        }
+    }
     en_result_t::Ok
 }
 //使能硬件停止事件
 pub fn Adt_EnableHwStop(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => peripheral
+                .ADTIM4
+                .hstpr
+                .modify(|r, w| w.bits(r.bits() | (1 << ADTIM_HW_STASTPCLR_EN))),
+
+            M0P_ADTIM_TypeDef::ADTIM5 => peripheral
+                .ADTIM5
+                .hstpr
+                .modify(|r, w| w.bits(r.bits() | (1 << ADTIM_HW_STASTPCLR_EN))),
+            M0P_ADTIM_TypeDef::ADTIM6 => peripheral
+                .ADTIM6
+                .hstpr
+                .modify(|r, w| w.bits(r.bits() | (1 << ADTIM_HW_STASTPCLR_EN))),
+        }
+    }
     en_result_t::Ok
 }
 //禁止硬件停止事件
 pub fn Adt_DisableHwStop(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => peripheral
+                .ADTIM4
+                .hstpr
+                .modify(|r, w| w.bits(r.bits() & ADTIM_HW_STASTPCLR_DIS)),
+
+            M0P_ADTIM_TypeDef::ADTIM5 => peripheral
+                .ADTIM5
+                .hstpr
+                .modify(|r, w| w.bits(r.bits() & ADTIM_HW_STASTPCLR_DIS)),
+            M0P_ADTIM_TypeDef::ADTIM6 => peripheral
+                .ADTIM6
+                .hstpr
+                .modify(|r, w| w.bits(r.bits() & ADTIM_HW_STASTPCLR_DIS)),
+        }
+    }
     en_result_t::Ok
 }
 //配置硬件清零事件
 pub fn Adt_CfgHwClear(ADTx: &M0P_ADTIM_TypeDef, enAdtHwClear: en_adt_hw_trig) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hcelr
+                    .modify(|r, w| w.bits(r.bits() | (1 << enAdtHwClear as u32)));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //清除硬件清零事件
 pub fn Adt_ClearHwClear(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral.ADTIM4.hcelr.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //使能硬件清零事件
 pub fn Adt_EnableHwClear(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hcelr
+                    .modify(|r, w| w.bits(r.bits() | (1 << ADTIM_HW_STASTPCLR_EN)));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //禁止硬件清零事件
 pub fn Adt_DisableHwClear(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hcelr
+                    .modify(|r, w| w.bits(r.bits() | ADTIM_HW_STASTPCLR_DIS));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //配置A通道硬件捕获事件
 pub fn Adt_CfgHwCaptureA(ADTx: &M0P_ADTIM_TypeDef, enAdtHwCaptureA: en_adt_hw_trig) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hcpar
+                    .modify(|r, w| w.bits(r.bits() | (1 << enAdtHwCaptureA as u32)));
+                peripheral.ADTIM4.pconr.write(|w| w.capca().bit(true));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //清除A通道硬件捕获事件
 pub fn Adt_ClearHwCaptureA(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral.ADTIM4.hcpar.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //配置B通道硬件捕获事件
 pub fn Adt_CfgHwCaptureB(ADTx: &M0P_ADTIM_TypeDef, enAdtHwCaptureB: en_adt_hw_trig) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral
+                    .ADTIM4
+                    .hcpbr
+                    .modify(|r, w| w.bits(r.bits() | (1 << enAdtHwCaptureB as u32)));
+                peripheral.ADTIM4.pconr.write(|w| w.capcb().bit(true));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //清除B通道硬件捕获事件
 pub fn Adt_ClearHwCaptureB(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {
+                peripheral.ADTIM4.hcpbr.write(|w| w.bits(0));
+            }
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //软件同步启动
 pub fn Adt_SwSyncStart(pstcAdtSwSyncStart: &stc_adt_sw_sync) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        let mut u32Val: u32 = 0;
+        if pstcAdtSwSyncStart.bAdTim4 {
+            u32Val |= ADTIM_SS_TIM4;
+        }
+        if pstcAdtSwSyncStart.bAdTim5 {
+            u32Val |= ADTIM_SS_TIM5;
+        }
+        if pstcAdtSwSyncStart.bAdTim6 {
+            u32Val |= ADTIM_SS_TIM6;
+        }
+        peripheral.ADTIM4.sstar.write(|w| w.bits(u32Val));
+    }
     en_result_t::Ok
 }
 //软件同步停止
@@ -694,6 +1037,14 @@ pub fn Adt_IrqTrigCfg(
     ADTx: &M0P_ADTIM_TypeDef,
     pstcAdtIrqTrigCfg: &stc_adt_irq_trig_cfg,
 ) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //端口触发配置
@@ -709,6 +1060,14 @@ pub fn Adt_CHxXPortCfg(
     enAdtCHxXPort: en_adt_CHxX_port,
     pstcAdtCHxXCfg: &stc_adt_TIMxX_port_cfg,
 ) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //使能端口刹车
@@ -750,50 +1109,146 @@ pub fn Adt_PwmDitherCfg(
 }
 //AdvTimer初始化
 pub fn Adt_Init(ADTx: &M0P_ADTIM_TypeDef, pstcAdtBaseCntCfg: &stc_adt_basecnt_cfg) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //AdvTimer去初始化
 pub fn Adt_DeInit(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //AdvTimert启动
 pub fn Adt_StartCount(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //AdvTimert停止
 pub fn Adt_StopCount(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //设置计数值
 pub fn Adt_SetCount(ADTx: &M0P_ADTIM_TypeDef, u16Value: u16) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //获取计数值
 pub fn Adt_GetCount(ADTx: &M0P_ADTIM_TypeDef) -> u16 {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     0
 }
 //清除计数值
 pub fn Adt_ClearCount(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //获取有效周期计数值
 pub fn Adt_GetVperNum(ADTx: &M0P_ADTIM_TypeDef) -> u8 {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     0
 }
 //获取状态标志
 pub fn Adt_GetState(ADTx: &M0P_ADTIM_TypeDef, enstate: en_adt_state_type) -> bool {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     true
 }
 //配置计数周期
 pub fn Adt_SetPeriod(ADTx: &M0P_ADTIM_TypeDef, u16Period: u16) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //配置计数周期缓冲
 pub fn Adt_SetPeriodBuf(ADTx: &M0P_ADTIM_TypeDef, u16PeriodBuf: u16) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //清除计数周期缓冲
 pub fn Adt_ClearPeriodBuf(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //配置有效计数周期
@@ -801,6 +1256,14 @@ pub fn Adt_SetValidPeriod(
     ADTx: &M0P_ADTIM_TypeDef,
     pstcAdtValidPerCfg: &stc_adt_validper_cfg,
 ) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //配置比较输出计数基准值
@@ -809,6 +1272,14 @@ pub fn Adt_SetCompareValue(
     enAdtCompare: en_adt_compare,
     u16Compare: u16,
 ) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //配置通用比较值/捕获值的缓存传送
@@ -817,10 +1288,26 @@ pub fn Adt_EnableValueBuf(
     enAdtCHxXPort: en_adt_CHxX_port,
     bCompareBufEn: bool,
 ) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //清除比较输出计数值/捕获值缓存
 pub fn Adt_ClearValueBuf(ADTx: &M0P_ADTIM_TypeDef, enAdtCHxXPort: en_adt_CHxX_port) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //获取捕获值
@@ -829,6 +1316,14 @@ pub fn Adt_GetCaptureValue(
     enAdtCHxXPort: en_adt_CHxX_port,
     pu16Capture: &mut u16,
 ) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //获取捕获缓存值
@@ -837,37 +1332,109 @@ pub fn Adt_GetCaptureBuf(
     enAdtCHxXPort: en_adt_CHxX_port,
     pu16CaptureBuf: &mut u16,
 ) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //设置死区时间上基准值
 pub fn Adt_SetDTUA(ADTx: &M0P_ADTIM_TypeDef, u16Value: u16) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //设置死区时间下基准值
 pub fn Adt_SetDTDA(ADTx: &M0P_ADTIM_TypeDef, u16Value: u16) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //配置死区时间功能
 pub fn Adt_CfgDT(ADTx: &M0P_ADTIM_TypeDef, bDTEn: bool, bEqual: bool) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //配置中断
 pub fn Adt_CfgIrq(ADTx: &M0P_ADTIM_TypeDef, enAdtIrq: en_adt_irq_type, bEn: bool) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //获取中断标志
 pub fn Adt_GetIrqFlag(ADTx: &M0P_ADTIM_TypeDef, enAdtIrq: en_adt_irq_type) -> bool {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     true
 }
 //清除中断标志
 pub fn Adt_ClearIrqFlag(ADTx: &M0P_ADTIM_TypeDef, enAdtIrq: en_adt_irq_type) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //清除所有中断标志
 pub fn Adt_ClearAllIrqFlag(ADTx: &M0P_ADTIM_TypeDef) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
 //Z相输入屏蔽设置
 pub fn Adt_CfgZMask(ADTx: &M0P_ADTIM_TypeDef, pstcAdtZMaskCfg: &stc_adt_zmask_cfg) -> en_result_t {
+    let peripheral = hc32l13x_pac::Peripherals::take().unwrap();
+    unsafe {
+        match ADTx {
+            M0P_ADTIM_TypeDef::ADTIM4 => {}
+            M0P_ADTIM_TypeDef::ADTIM5 => {}
+            M0P_ADTIM_TypeDef::ADTIM6 => {}
+        }
+    }
     en_result_t::Ok
 }
